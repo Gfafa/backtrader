@@ -47,7 +47,8 @@ class TestStrategy(bt.Strategy):
         # self.buy_stock = self.p.buy_stocks # 保留调仓信息
         
         self.trade_dates = pd.to_datetime(df_trade['trade_date'].unique()).tolist()
-        self.buy_stock = df_trade
+        #TODO buy_stock可能要使用权重大于0的数据
+        self.buy_stock = df_trade[df_trade['weight']>0]
         
         self.order_list = []  # 记录以往订单，在调仓日要全部取消未成交的订单
         self.buy_stocks_pre = [] # 记录上一期持仓
@@ -186,7 +187,7 @@ if __name__ == "__main__":
                 if df_trade.iloc[-1]['weight'] != weight:
                     df_trade.loc[len(df_trade)] = [trade_date,sec_code,weight]
                     # print(df_trade.iloc[-1])
-            else:
+            elif weight > 0:#找能建仓的时间点
                 df_trade.loc[len(df_trade)] = [trade_date,sec_code,weight]
                 # print(df_trade.iloc[-1])
     df_trade = df_trade.sort_values(by='trade_date',ascending=True)
